@@ -145,7 +145,7 @@ V. Downloading the example data
 
 Data download link: https://uabox.univ-angers.fr/index.php/s/mcZg2cEcaeBhWCw
 
-You can download a dataset composed of 597 RGB images and 597 Depth images by following the link given above. Once you have downloaded the data, copy the folders <b>coordinates</b>, <b>datetime</b>, <b>files</b>, <b>images</b> and <b>projects</b> in the directory <b>files</b> previously created and used to import and export files between the container and the host. Then start the container and you can test the Growth Data interface on this data.
+You can download a dataset composed of 597 RGB images and 597 Depth images by following the link given above. Once you have downloaded the data, copy the folders "coordinates", "datetime", "files", "images" and projects in the directory "files" previously created and used to import and export files between the container and the host. Then start the container and you can test the Growth Data interface on this data.
 
 
 VI. Demonstrating the use of the program
