@@ -1,0 +1,156 @@
+Images of the GrowthData interface allowing the parallel processing of RGB and Depth images from the monitoring of the growth of different plants and acquired via Intel D435 cameras. This application was developed in Python by the ImHorPhen team of the UMR IRHS INRAE of Beaucouzé (France).
+
+Source: https://hub.docker.com/r/yorffoeg/growth_data_images
+
+Summary:
+=======
+
+I. Recovery of the Docker image
+II. Launching the application with Windows
+II.1 Software requirements
+    II.2 Installation of CygwinX software
+    II.3 Creating the bash file run.sh
+    II.4 Installation of VcXsrv Windows X Server
+III. Installation with Ubuntu
+    III.1 Installation of Docker Community Edition
+    III.2 Creating the bash run.sh file
+IV. Starting the Growth Data container
+V. Downloading the example data
+VI. Demonstrating the use of the program
+
+
+I. Recovery of the Docker image
+===============================
+
+Command : docker pull yorffoeg/growth_data_images
+
+
+II. Launching the application with Windows
+==========================================
+
+II.1. Software requirements
+---------------------------
+
+Links to the software to be installed :
+- Docker Hub : https://hub.docker.com
+- Docker Desktop : https://www.docker.com/products/docker-desktop/
+- WSL2 up to date : https://learn.microsoft.com/fr-fr/windows/wsl/install
+- Ubuntu distribution for WSL2 : https://apps.microsoft.com/store/detail/ubuntu-22042-lts/9PN20MSR04DW?hl=fr-fr&gl=fr&rtc=1
+- CygwinX : https://www.cygwin.com/install.html
+- VcXsrv Windows X Server : https://sourceforge.net/projects/vcxsrv/
+
+With Windows you will need some software to run the Growth Data interface. Start by creating an account on the Docker Hub page (see link above) then download and install Docker Desktop, WSL2 and the Ubuntu distribution for WSL2. Once you have installed these first programs, you can verify that Docker is working properly by opening a WSL terminal with the previously installed Linux distribution (you will be asked to create a username and password the first time), then enter the command docker login, so you will be asked to authenticate with the credentials created on Docker Hub. Then try to run a first container like 'hello-world' by simply typing the command: docker run hello-world. The container image will be downloaded and executed and if everything is working properly you will see the message 'Hello from Docker!' in your terminal.
+
+
+II.2. Installation of CygwinX software
+--------------------------------------
+
+Links :
+- File setup-x86_64.exe to install CygwinX : http://cygwin.com/setup-x86_64.exe
+- CygwinX installation : https://x.cygwin.com/docs/ug/setup.html#setup-cygwin-x-installing
+- CygwinX user's guide : https://x.cygwin.com/docs/ug/cygwin-x-ug.html
+
+
+Regarding the Cygwin/X program, open the download link above and then start to download the file by clicking on the link to the file setup-x86_64.exe (see direct link above to the setup file or go to the Downloading and Installing section on the Cygwin/X page). You can follow the documentation for the installation and configuration of Cygwin/X by opening the corresponding link above. During the installation of the program you will be presented with a window that allows you to install different packages according to your needs. First, in the 'View' tab above the package selection area, choose 'Category'. To install a package, find the corresponding line then in the 'New' column, simply choose the version of the package you want to install. In case of doubt about the version, it is best to choose the most recent version. In the 'View' drop-down list, choose the 'Category' option, and select the following packages in their most recent version:
+- Doc category : xorg-docs
+- Net category : openssh / inetutils / rsh
+- X11 category : xorg-server / xinit / xlaunch / xeyes
+
+If you have finalized the installation, the only way to install new packages is to run the Cygwin/X installation file (setup-x86_64.exe) again without changing the settings previously entered until the package installation choice.
+
+
+II.3. Creating the bash file run.sh
+-----------------------------------
+
+Via the WSL terminal on an Ubuntu distribution (not tested on other distributions for the moment), retrieve the image using the command given in the first part (docker pull yorffoeg/growth_data_images). Then create a folder named "files" wherever you want on your computer, this is the folder that will serve as a shared folder with the application. Once your data is processed, you will get your measurements, features and predictions in this folder. Now create a file named "run.sh" with the text editor of your choice, and insert in this file the following commands while replacing the variable "$(pwd)" (4th line of the "docker run" command) by the path of the folder containing the "files" folder previously created:
+
+export DISPLAY=$(echo $(grep nameserver /etc/resolv.conf | sed 's/nameserver //'):0.0)
+
+docker run -u=$(id -u $USER):$(id -g $USER) \
+           -e DISPLAY=$DISPLAY \
+           -v growth_data_volume:/app:rw \
+           -v $(pwd)/files:/app/src \
+           --rm \
+           -it \
+           -d \
+           yorffoeg/growth_data_images:latest
+
+Thus, all the files you put in the 'files' folder will be accessible via the GrowthData application in the '/app/src' directory and all the files you export from the interface in this folder will be found directly in your 'files' directory, even once the application is closed. It is also in this folder that you can copy the example data (see the last part dedicated to this).
+
+
+II.4. Installation of VcXsrv Windows X Server
+---------------------------------------------
+
+Link :
+- VcXsrv Windows X Server : https://sourceforge.net/projects/vcxsrv/
+
+Follow the VcXsrv Windows X Server link above and download the program installation executable. Once the download is complete, start the installation, follow the different steps until it is finalized. Finally, before you can start the application, you must start the xlaunch.exe program (you should have a shortcut on your desktop if you kept the default options during the installation), choose <b>Multiple window</b>, click on next, don't change anything (leave <b>start no client</b> checked) on the second page, click next again, and on this last page, check the <b>Disable access control</b> box, click next again and finish the configuration. If your firewall displays a warning, unblock the program's network access. In the Windows taskbar, in the submenu displayed via the rightmost arrow (just before the icons followed by the date and time), you should see a new xlaunch icon. When you move the mouse over it you will see information displayed as <b>ComputerName:0.0 - 0 client</b>, this is a sign that the installation and configuration went well. The Xlaunch program must be started for the interface to be displayed. To start the application, the procedure is described in part IV.
+
+
+III. Installation with Ubuntu
+=============================
+
+III.1. Installation of Docker Community Edition
+-----------------------------------------------
+
+Link :
+- Docker Hub : https://hub.docker.com
+
+With Ubuntu, we will prefer Docker Community Edition (or Docker CE) to Docker Desktop, free to install Docker Desktop if you prefer, but I will only detail here how to install Docker CE. Start by going to the Docker Hub page via the link given above and create an account. Once this is done, simply follow the steps below by entering the commands given in the terminal:
+
+1. System update and installation of prerequisites for Docker installation:
+sudo apt-get update && sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+
+2. Adding the Docker repository :
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+
+3. Installing Docker:
+sudo apt update && sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+4. Unlock the necessary accesses to communicate with the Docker daemon :
+sudo usermod -aG docker $USER
+
+5. Restart your computer
+
+Once your computer is restarted, you can check that Docker is working properly. To do this, open a terminal and enter the command docker login, you will then be asked to authenticate with the credentials previously created on Docker Hub. Then try to run a first container like 'hello-world' by simply typing the command: docker run hello-world. The Docker image will be downloaded and executed and if everything is working properly you will see the message 'Hello from Docker!' in your terminal.
+
+
+III.2. Creating the bash run.sh file
+------------------------------------
+
+Via Ubuntu's terminal (not tested under other distributions for now), retrieve the image using the command given in the first part (docker pull yorffoeg/growth_data_images). Then create a folder named "files" wherever you want on your computer, this is the folder that will serve as an exchange with the application. Once your data is processed, you will retrieve your measurements, features and predictions in the latter. Now create a file named "run.sh" with the text editor of your choice, and insert in this file the following commands while replacing the "$(pwd)" variable (4th line of the "docker run" command) by the path of the folder containing the "files" folder previously created:
+
+docker run -u=$(id -u $USER):$(id -g $USER) \
+           -e DISPLAY=$DISPLAY \
+           -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+           -v growth_data_volume:/app:rw \
+           -v ./files:/app/src \
+           --rm \
+           -it \
+           -d \
+           yorffoeg/growth_data_images:latest
+
+Thus, all the files you put in the 'files' folder will be accessible via the GrowthData application in the '/app/src' directory and all the files you export from the interface in this folder will be found directly in your 'files' folder, even once the application is closed. It is also in this folder that you can copy the example data (see the part V dedicated to this).
+
+
+IV. Starting the Growth Data container
+======================================
+
+It is now possible to start the Growth Data application. To do this, open a terminal on Ubuntu, or a WSL terminal with the Ubuntu distribution on Windows and go to the folder where your bash file run.sh is located. If you have not yet retrieved the Growth Data image, do so by entering the command: docker pull yorffoeg/growth_data_images. Once the image is downloaded, you can run the interface via the command: <b>bash run.sh</b>. Wait a few seconds and the container should start, a container ID should also be displayed in your terminal. You can browse the files of the container during its execution with the following command, by replacing <b>ContainerID</b> with the one returned to you when you run it: docker exec -ti ContainerID bash.
+
+
+V. Downloading the example data
+===============================
+
+Data download link: https://uabox.univ-angers.fr/index.php/s/mcZg2cEcaeBhWCw
+
+You can download a dataset composed of 597 RGB images and 597 Depth images by following the link given above. Once you have downloaded the data, copy the folders <b>coordinates</b>, <b>datetime</b>, <b>files</b>, <b>images</b> and <b>projects</b> in the directory <b>files</b> previously created and used to import and export files between the container and the host. Then start the container and you can test the Growth Data interface on this data.
+
+
+VI. Demonstrating the use of the program
+========================================
+
+Link to the demonstration video: https://uabox.univ-angers.fr/index.php/s/2ELsSfG6m7g53OD
+
+The link above will take you to a video demonstration of how to use the software.
